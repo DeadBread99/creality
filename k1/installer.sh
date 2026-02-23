@@ -2110,7 +2110,7 @@ fi
         elif [ "$1" = "--force" ]; then
           force=true
           shift
-        elif [ "$1" = "microprobe" ] || [ "$1" = "bltouch" ] || [ "$1" = "beacon" ] || [ "$1" = "klicky" ] || [ "$1" = "cartographer" ] || [ "$1" = "cartotouch" ] || [ "$1" = "btteddy" ] || [ "$1" = "eddyng" ]; then
+        elif [ "$1" = "microprobe" ] || [ "$1" = "bltouch" ] || [ "$1" = "beacon" ] || [ "$1" = "klicky" ] || [ "$1" = "cartographer" ] || [ "$1" = "cartotouch" ] || [ "$1" = "btteddy" ] || [ "$1" = "eddyng" ] || [ "$1" = "loadcell" ]; then
             if [ "$mode" = "fix-serial" ]; then
                 echo "ERROR: Switching probes is not supported while trying to fix serial!"
                 exit 1
