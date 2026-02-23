@@ -863,7 +863,7 @@ function install_klipper() {
         $CONFIG_HELPER --remove-section "dirzctl" || exit $?
         $CONFIG_HELPER --remove-section "accel_chip_proxy" || exit $?
         $CONFIG_HELPER --remove-section "z_compensate" || exit $?
-        $CONFIG_HELPER --remove-section "mcu leveling_mcu" || exit $?
+        #$CONFIG_HELPER --remove-section "mcu leveling_mcu" || exit $?
         $CONFIG_HELPER --remove-section "bl24c16f" || exit $?
         $CONFIG_HELPER --remove-section "prtouch_v2" || exit $?
         $CONFIG_HELPER --remove-section "output_pin power" || exit $?
@@ -1557,6 +1557,34 @@ function set_serial_cartographer() {
         return 0
     fi
 }
+
+function setup_loadcell() {
+    grep -q "loadcell-probe" /usr/data/pellcorp.done
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "INFO: Setting up loadcell ..."
+
+        cleanup_probe bltouch
+        cleanup_probe microprobe
+        cleanup_probe cartographer
+        cleanup_probe cartotouch
+        cleanup_probe btteddy
+
+        cp /usr/data/pellcorp/k1/loadcell.cfg /usr/data/printer_data/config/ || exit $?
+
+        $CONFIG_HELPER --add-include "loadcell.cfg" || exit $?
+        $CONFIG_HELPER --add-include "loadcell-${model}.cfg" || exit $?
+        $CONFIG_HELPER --replace-section-entry "mcu" "baud" "921600" || exit $?
+        $CONFIG_HELPER --replace-section-entry "mcu nozzle_mcu" "baud" "921600" || exit $?
+        $CONFIG_HELPER --replace-section-entry "mcu leveling_mcu" "baud" "921600" || exit $?
+
+        echo "loadcell-probe" >> /usr/data/pellcorp.done
+        sync
+        return 1
+    fi
+    return 0
+}
+
 
 function setup_cartographer() {
     grep -q "cartographer-probe" /usr/data/pellcorp.done
@@ -2427,6 +2455,9 @@ fi
         setup_probe_specific=$?
     elif [ "$probe" = "microprobe" ]; then
         setup_microprobe
+        setup_probe_specific=$?
+    elif [ "$probe" = "loadcellprobe" ]; then
+        setup_loadcell
         setup_probe_specific=$?
     elif [ "$probe" = "beacon" ]; then
         setup_beacon
